@@ -11,6 +11,7 @@
         <VoiceButton
           :disabled="aiChat.isStreaming"
           @result="onVoiceResult"
+          @interim="onVoiceInterim"
         />
       </template>
     </el-input>
@@ -41,6 +42,10 @@ function send() {
 }
 
 function onVoiceResult(text) {
+  if (text) inputText.value = text
+}
+
+function onVoiceInterim(text) {
   inputText.value = text
 }
 </script>

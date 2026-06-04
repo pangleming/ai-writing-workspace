@@ -16,6 +16,7 @@
     >
       <template #append>
         <VoiceButton
+          ref="voiceButtonRef"
           @result="onVoiceResult"
           @interim="onVoiceInterim"
         />
@@ -29,12 +30,13 @@
 </template>
 
 <script setup>
-import { ref } from 'vue'
+import { ref, onMounted, onUnmounted } from 'vue'
 import { useEditorStore } from '../../stores/editor.js'
 import VoiceButton from '../voice/VoiceButton.vue'
 
 const editor = useEditorStore()
 const inputText = ref('')
+const voiceButtonRef = ref(null)
 
 function addFromInput() {
   const text = inputText.value.trim()
@@ -44,9 +46,9 @@ function addFromInput() {
 }
 
 function onVoiceResult(text) {
-  if (text) {
-    editor.addParagraph(text)
-  }
+  if (!text) return
+  editor.addParagraph(text)
+  inputText.value = ''
 }
 
 function onVoiceInterim(text) {
@@ -61,6 +63,18 @@ async function pasteArticle() {
     console.error('Clipboard read failed:', e)
   }
 }
+
+function onGestureToggleVoice() {
+  voiceButtonRef.value?.toggle()
+}
+
+onMounted(() => {
+  window.addEventListener('gesture-toggle-voice', onGestureToggleVoice)
+})
+
+onUnmounted(() => {
+  window.removeEventListener('gesture-toggle-voice', onGestureToggleVoice)
+})
 </script>
 
 <style scoped>

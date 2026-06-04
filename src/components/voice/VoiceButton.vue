@@ -11,20 +11,23 @@
 </template>
 
 <script setup>
-import { ref } from 'vue'
-import { isSpeechSupported, createRecognition, destroyRecognition, detectLanguage } from '../../services/speech.js'
+import { ref, onUnmounted } from 'vue'
+import { ElMessage } from 'element-plus'
+import {
+  isSpeechSupported,
+  createSpeechSession,
+  detectLanguage
+} from '../../services/speech.js'
 import { useConfigStore } from '../../stores/config.js'
 
 const props = defineProps({
   disabled: { type: Boolean, default: false }
 })
 
-const emit = defineEmits(['result', 'interim', 'listening'])
+const emit = defineEmits(['result', 'interim', 'listening', 'error'])
 
 const supported = isSpeechSupported()
 const isListening = ref(false)
-let recognition = null
-
 const config = useConfigStore()
 
 function getLang() {
@@ -33,55 +36,27 @@ function getLang() {
   return 'en-US'
 }
 
+const session = createSpeechSession({
+  getLang,
+  onFinal: (text) => emit('result', text),
+  onInterim: (text) => emit('interim', text),
+  onError: (message) => {
+    emit('error', message)
+    ElMessage.warning({ message, duration: 5000, showClose: true })
+  },
+  onListeningChange: (listening) => {
+    isListening.value = listening
+    emit('listening', listening)
+  }
+})
+
 function toggle() {
-  if (isListening.value) {
-    stopListening()
-  } else {
-    startListening()
-  }
+  session.toggle()
 }
 
-function startListening() {
-  recognition = createRecognition(getLang())
-  if (!recognition) return
+onUnmounted(() => {
+  session.stop()
+})
 
-  recognition.onresult = (event) => {
-    let interim = ''
-    let final = ''
-    for (let i = event.resultIndex; i < event.results.length; i++) {
-      const transcript = event.results[i][0].transcript
-      if (event.results[i].isFinal) {
-        final += transcript
-      } else {
-        interim += transcript
-      }
-    }
-    if (final) emit('result', final)
-    if (interim) emit('interim', interim)
-  }
-
-  recognition.onerror = (event) => {
-    if (event.error === 'not-allowed') {
-      console.error('Microphone access denied')
-    }
-    stopListening()
-  }
-
-  recognition.onend = () => {
-    if (isListening.value) {
-      recognition?.start()
-    }
-  }
-
-  recognition.start()
-  isListening.value = true
-  emit('listening', true)
-}
-
-function stopListening() {
-  destroyRecognition(recognition)
-  recognition = null
-  isListening.value = false
-  emit('listening', false)
-}
+defineExpose({ toggle, isListening })
 </script>

@@ -1,20 +1,27 @@
 import { defineStore } from 'pinia'
 import { ref, reactive } from 'vue'
 
+// ─────────────────────────────────────────────
+// 手势功能映射
+//
+//  Open Palm    → 调出 / 关闭 AI 助手
+//  Index Finger → 向上滚动
+//  Scissor      → 向下滚动
+//  Fist         → 调出 / 关闭语音识别
+// ─────────────────────────────────────────────
+
 const COOLDOWNS = {
-  'Open Palm': 2000,
-  'Scissor': 1000,
-  'Index Finger': 1000,
-  'Fist': 2000,
-  'Rock Gesture': 2000
+  'Open Palm':    2000,  // 召唤/关闭 AI，防误触
+  'Index Finger':  600,  // 滚动，冷却短一些保持连续感
+  'Scissor':       600,  // 滚动，同上
+  'Fist':         2000   // 语音开关，防误触
 }
 
 const HOLD_TIMES = {
-  'Open Palm': 1000,
-  'Scissor': 500,
-  'Index Finger': 500,
-  'Fist': 500,
-  'Rock Gesture': 500
+  'Open Palm':    700,  // 需要稳定张开手掌再触发
+  'Index Finger':   0,  // 瞬态：检测到即触发，靠 cooldown 防重复
+  'Scissor':        0,  // 瞬态：同上
+  'Fist':         600   // 需要稳定握拳再触发，防误触
 }
 
 export const useGestureStore = defineStore('gesture', () => {
@@ -30,14 +37,19 @@ export const useGestureStore = defineStore('gesture', () => {
     const now = Date.now()
 
     if (name !== 'No Hand Detected') {
+      // 手势切换时重置该手势的计时器
       if (prev !== name) {
         gestureStartTime[name] = now
       }
 
-      const elapsed = now - (gestureStartTime[name] || now)
-      const requiredHold = HOLD_TIMES[name] || 500
+      const requiredHold = HOLD_TIMES[name] ?? 500
 
-      if (elapsed >= requiredHold) {
+      // hold = 0 的瞬态手势直接进入 cooldown 判断
+      const holdOk = requiredHold === 0
+        ? true
+        : (now - (gestureStartTime[name] || now)) >= requiredHold
+
+      if (holdOk) {
         const lastTime = lastTriggered[name] || 0
         const cooldown = COOLDOWNS[name] || 2000
 

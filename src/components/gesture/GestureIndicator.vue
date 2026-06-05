@@ -3,18 +3,19 @@
     class="gesture-indicator"
     :class="{ active: gesture.isActive, minimized: minimized }"
     @click="emit('toggle')"
-    :title="`Gesture: ${gesture.currentGesture}`"
+    :title="gesture.currentGesture"
   >
     <span v-if="minimized" class="indicator-icon">
       {{ gesture.isActive ? '🖐' : '🖐️' }}
     </span>
     <span v-else class="indicator-text">
-      {{ gesture.currentGesture }}
+      {{ displayLabel }}
     </span>
   </div>
 </template>
 
 <script setup>
+import { computed } from 'vue'
 import { useGestureStore } from '../../stores/gesture.js'
 
 defineProps({
@@ -24,6 +25,18 @@ defineProps({
 const emit = defineEmits(['toggle'])
 
 const gesture = useGestureStore()
+
+// 手势 → 功能说明（与 GestureOverlay 保持一致）
+const GESTURE_LABELS = {
+  'Open Palm':    '✋ AI 助手',
+  'Index Finger': '☝️ 向上滚动',
+  'Scissor':      '✌️ 向下滚动',
+  'Fist':         '✊ 语音识别'
+}
+
+const displayLabel = computed(() =>
+  GESTURE_LABELS[gesture.currentGesture] ?? gesture.currentGesture
+)
 </script>
 
 <style scoped>

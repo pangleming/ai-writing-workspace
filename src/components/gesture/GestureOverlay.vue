@@ -43,8 +43,9 @@
           :key="g"
           class="gesture-tag"
           :class="{ highlighted: gesture.currentGesture === g }"
+          :title="g"
         >
-          {{ g }}
+          {{ gestureLabels[g] ?? g }}
         </span>
       </div>
     </div>
@@ -68,7 +69,21 @@ const cameraError = ref('')
 const videoRef = ref(null)
 const overlayRef = ref(null)
 
-const gestures = ['Open Palm', 'Scissor', 'Index Finger', 'Fist', 'Rock Gesture']
+// 四个核心手势
+const gestures = [
+  'Open Palm',
+  'Index Finger',
+  'Scissor',
+  'Fist'
+]
+
+// 手势 → 功能说明（悬浮 tooltip）
+const gestureLabels = {
+  'Open Palm':    '✋ AI 助手',
+  'Index Finger': '☝️ 向上滚动',
+  'Scissor':      '✌️ 向下滚动',
+  'Fist':         '✊ 语音识别'
+}
 
 const dragPos = reactive({ x: 20, y: 96 })
 const dragging = ref(false)
@@ -99,22 +114,37 @@ function stopDrag() {
   dragging.value = false
 }
 
+function scrollEditor(direction) {
+  const el = document.querySelector('.workspace-editor')
+  if (el) {
+    el.scrollBy({
+      top: direction * el.clientHeight * 0.8,
+      behavior: 'smooth'
+    })
+  }
+}
+
 function handleGestureAction(name) {
   switch (name) {
+
+    // ✋ 张开手掌（静止）→ 调出 / 关闭 AI 助手
     case 'Open Palm':
       aiChat.toggleSidebar()
       break
-    case 'Scissor':
-      window.scrollBy({ top: window.innerHeight * 0.8, behavior: 'smooth' })
-      break
+
+    // ☝️ 一根手指（食指）→ 向上滚动
     case 'Index Finger':
-      window.scrollBy({ top: -window.innerHeight * 0.8, behavior: 'smooth' })
+      scrollEditor(-1)
       break
+
+    // ✌️ 两根手指（剪刀手）→ 向下滚动
+    case 'Scissor':
+      scrollEditor(1)
+      break
+
+    // ✊ 握拳 → 调出 / 关闭语音识别
     case 'Fist':
       window.dispatchEvent(new CustomEvent('gesture-toggle-voice'))
-      break
-    case 'Rock Gesture':
-      window.dispatchEvent(new CustomEvent('gesture-switch-focus'))
       break
   }
 }
@@ -130,9 +160,16 @@ async function requestCamera() {
       gesture.setActive(true)
 
       detector = new GestureDetector((gestureName) => {
-        const triggered = gesture.updateGesture(gestureName)
-        if (triggered) handleGestureAction(triggered)
-      })
+  console.log('识别到:', gestureName)
+
+  const triggered = gesture.updateGesture(gestureName)
+
+  console.log('触发结果:', triggered)
+
+  if (triggered) {
+    handleGestureAction(triggered)
+  }
+})
 
       await detector.start(videoRef.value)
     }

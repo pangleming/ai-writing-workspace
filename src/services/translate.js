@@ -1,29 +1,32 @@
-import md5 from 'js-md5'
+import md5 from 'blueimp-md5'
 
 export async function translateText(text, appId, secretKey, toLang = 'auto') {
-  if (!appId || !secretKey) {
+  const appIdClean = String(appId).trim()
+  const secretKeyClean = String(secretKey).trim()
+
+  if (!appIdClean || !secretKeyClean) {
     throw new Error('Baidu Translate API keys not configured')
   }
 
   const hasChinese = /[一-鿿]/.test(text)
   const targetLang = toLang === 'auto' ? (hasChinese ? 'en' : 'zh') : toLang
 
-  const salt = String(Math.floor(Math.random() * 100000))
-  const signStr = String(appId) + text + salt + String(secretKey)
+  const salt = Math.floor(Math.random() * 32768) + 32768
+  const signStr = appIdClean + text + salt + secretKeyClean
   const sign = md5(signStr)
 
-  const body = new URLSearchParams()
-  body.append('q', text)
-  body.append('from', 'auto')
-  body.append('to', targetLang)
-  body.append('appid', String(appId))
-  body.append('salt', salt)
-  body.append('sign', sign)
+  const formBody = new URLSearchParams()
+  formBody.append('q', text)
+  formBody.append('from', 'auto')
+  formBody.append('to', targetLang)
+  formBody.append('appid', appIdClean)
+  formBody.append('salt', String(salt))
+  formBody.append('sign', sign)
 
   const response = await fetch('/api/baidu-translate', {
     method: 'POST',
     headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
-    body: body.toString()
+    body: formBody.toString()
   })
 
   const data = await response.json()
@@ -35,7 +38,9 @@ export async function translateText(text, appId, secretKey, toLang = 'auto') {
       to: data.to
     }
   } else {
-    throw new Error(data.error_msg || 'Translation failed')
+    const errCode = data.error_code || 'unknown'
+    const errMsg = data.error_msg || 'Translation failed'
+    throw new Error(`${errMsg} (code: ${errCode})`)
   }
 }
 

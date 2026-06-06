@@ -5,13 +5,16 @@ export async function sendMessage(messages, apiKey, articleContext = '') {
 
   const systemMessage = {
     role: 'system',
-    content: `You are a helpful AI writing and reading assistant. The user is working on the following article. When they ask questions, use this context to provide relevant answers.
+    content: `你是一个专业的 AI 写作与阅读助手。用户正在处理以下文章，请基于文章内容回答用户的问题。
 
-=== ARTICLE CONTEXT ===
+=== 文章上下文 ===
 ${articleContext.slice(0, 4000)}
-=== END CONTEXT ===
+=== 上下文结束 ===
 
-Respond concisely and helpfully in the same language the user uses.`
+规则：
+1. 始终用中文回复，除非用户明确使用英文提问。
+2. 回答简洁、专业、有帮助。
+3. 如果用户请求润色/扩写/解释某段文字，直接在中文语境下处理。`
   }
 
   const allMessages = [systemMessage, ...messages]

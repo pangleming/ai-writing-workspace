@@ -4,7 +4,7 @@
       {{ message.role === 'user' ? '🧑' : '🤖' }}
     </div>
     <div class="message-body">
-      <div class="message-content">{{ message.content }}</div>
+      <div class="message-content" v-html="renderedContent"></div>
       <div class="message-footer">
         <span class="message-time">{{ message.time }}</span>
         <el-button
@@ -21,7 +21,9 @@
 </template>
 
 <script setup>
+import { computed } from 'vue'
 import { ElMessage } from 'element-plus'
+import { marked } from 'marked'
 
 const props = defineProps({
   message: { type: Object, required: true }
@@ -31,6 +33,11 @@ function copyContent() {
   navigator.clipboard.writeText(props.message.content)
   ElMessage.success('Copied')
 }
+
+const renderedContent = computed(() => {
+  if (props.message.role === 'user') return props.message.content
+  return marked.parse(props.message.content, { breaks: true })
+})
 </script>
 
 <style scoped>

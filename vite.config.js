@@ -10,7 +10,13 @@ export default defineConfig({
       '/api/baidu-translate': {
         target: 'https://fanyi-api.baidu.com',
         changeOrigin: true,
-        rewrite: (path) => path.replace(/^\/api\/baidu-translate/, '/api/trans/vip/translate')
+        rewrite: (path) => path.replace(/^\/api\/baidu-translate/, '/api/trans/vip/translate'),
+        configure: (proxy) => {
+          proxy.on('proxyReq', (proxyReq) => {
+            proxyReq.removeHeader('origin')
+            proxyReq.removeHeader('referer')
+          })
+        }
       }
     }
   }

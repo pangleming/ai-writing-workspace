@@ -11,7 +11,7 @@ export async function translateText(text, appId, secretKey, toLang = 'auto') {
   const hasChinese = /[一-鿿]/.test(text)
   const targetLang = toLang === 'auto' ? (hasChinese ? 'en' : 'zh') : toLang
 
-  const salt = Math.floor(Math.random() * 32768) + 32768
+  const salt = crypto.getRandomValues(new Uint32Array(1))[0] % 32768 + 32768
   const signStr = appIdClean + text + salt + secretKeyClean
   const sign = md5(signStr)
 

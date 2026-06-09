@@ -24,6 +24,7 @@
 import { computed } from 'vue'
 import { ElMessage } from 'element-plus'
 import { marked } from 'marked'
+import DOMPurify from 'dompurify'
 
 const props = defineProps({
   message: { type: Object, required: true }
@@ -36,7 +37,8 @@ function copyContent() {
 
 const renderedContent = computed(() => {
   if (props.message.role === 'user') return props.message.content
-  return marked.parse(props.message.content, { breaks: true })
+  const raw = marked.parse(props.message.content, { breaks: true })
+  return DOMPurify.sanitize(raw)
 })
 </script>
 

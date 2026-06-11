@@ -62,6 +62,18 @@ LexiVault is a lightweight course-project prototype inspired by modern Markdown-
 
 ---
 
+---
+
+## Team & Contributions
+
+| Member | Module | Responsibilities |
+|--------|--------|----------------|
+| 邹世豪 | AI Assistant + Translation | DeepSeek Chat API streaming integration, AiSidebar / ChatMessage / AiInputBar components, Markdown rendering with XSS sanitization, Baidu Translate API MD5 signing, Vite proxy configuration, selection-based translation UI, Settings modal API configuration, Markdown editor integration (Vditor), document management, Outline navigation, internal link interception |
+| 庞乐鸣 | Gesture Control | MediaPipe Hands pipeline, GestureOverlay (draggable camera window), GestureIndicator, five-gesture classifier with hold-time gating, action mapping to workspace controls |
+| 廖毅玮 | Voice Input | Web Speech API integration, VoiceButton component, dual-microphone architecture (bottom bar + AI sidebar), interim/final result handling |
+
+---
+
 ## Technology Stack
 
 | Layer | Technology |

@@ -198,19 +198,6 @@ docs/test-fixtures/        (Markdown samples for manual testing)
 
 ---
 
-## Design & References
-
-LexiVault is designed as a **coursework prototype**. Its architecture is inspired by:
-
-- **Obsidian** — local-first Markdown vault concept
-- **SiYuan** — block-based note-taking with outline navigation
-- **Burner-X** — browser-side AI document reading and translation
-- **Vditor** — Markdown WYSIWYG/IR editing engine
-
-No code was copied from SiYuan (AGPLv3) or Burner-X. Vditor is used as an npm dependency under the MIT license. All external APIs are used within their respective free-tier terms.
-
----
-
 ## License
 
 This project is submitted as coursework for the User Interaction Technology course at Tongji University (2026).

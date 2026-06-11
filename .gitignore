@@ -22,5 +22,8 @@ Thumbs.db
 *.zip
 *.tar.gz
 
+# Project docs (local only, not for submission)
+docs/
+
 # Vditor local runtime assets — must be included
 # DO NOT ignore public/vditor/

@@ -1,16 +1,10 @@
 <template>
   <div class="ai-sidebar">
-    <div class="sidebar-header">
-      <h3>🤖 AI Assistant</h3>
-      <span class="context-badge" v-if="articleLength > 0">
-        📄 {{ articleLength }} chars
+    <div class="sidebar-toolbar">
+      <span class="context-badge" v-if="contextLength > 0">
+        📄 {{ contextLength }} chars
       </span>
-      <el-button size="small" text @click="aiChat.clearHistory" title="Clear chat">
-        🗑
-      </el-button>
-      <el-button size="small" text @click="aiChat.closeSidebar" title="Close">
-        ✕
-      </el-button>
+      <el-button size="small" text @click="aiChat.clearHistory" title="Clear chat">🗑</el-button>
     </div>
 
     <div class="messages-container" ref="messagesRef">
@@ -20,8 +14,8 @@
         :message="msg"
       />
       <div v-if="aiChat.messages.length === 0" class="empty-chat">
-        <p>Ask questions about your article.</p>
-        <p class="hint">Select text in the editor to get AI help.</p>
+        <p>Ask questions about your document.</p>
+        <p class="hint">Select text in the editor to get AI help — explain, polish, expand, summarize, translate, or make academic.</p>
       </div>
       <div v-if="aiChat.isStreaming" class="streaming-indicator">
         <span class="loading-icon">⟳</span>
@@ -36,15 +30,15 @@
 <script setup>
 import { computed, ref, watch, nextTick } from 'vue'
 import { useAiChatStore } from '../../stores/aiChat.js'
-import { useEditorStore } from '../../stores/editor.js'
+import { useDocumentStore } from '../../stores/document.js'
 import ChatMessage from './ChatMessage.vue'
 import AiInputBar from './AiInputBar.vue'
 
 const aiChat = useAiChatStore()
-const editor = useEditorStore()
+const doc = useDocumentStore()
 const messagesRef = ref(null)
 
-const articleLength = computed(() => editor.fullText().length)
+const contextLength = computed(() => doc.activeMarkdown.length)
 
 watch(() => aiChat.messages.length, async () => {
   await nextTick()
@@ -61,18 +55,12 @@ watch(() => aiChat.messages.length, async () => {
   height: 100%;
 }
 
-.sidebar-header {
+.sidebar-toolbar {
   display: flex;
   align-items: center;
   gap: 8px;
-  padding: 14px 16px;
+  padding: 6px 12px;
   border-bottom: 1px solid var(--color-border);
-}
-
-.sidebar-header h3 {
-  font-size: 15px;
-  font-weight: 600;
-  flex: 1;
 }
 
 .context-badge {
@@ -100,6 +88,7 @@ watch(() => aiChat.messages.length, async () => {
   font-size: 12px;
   margin-top: 8px;
   color: #999;
+  line-height: 1.5;
 }
 
 .streaming-indicator {

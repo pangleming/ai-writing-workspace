@@ -1,7 +1,7 @@
 <template>
   <div class="topbar">
     <div class="topbar-left">
-      <span class="topbar-logo">📝 AI Workspace</span>
+      <span class="topbar-logo">📚 LexiVault</span>
     </div>
 
     <div class="topbar-center">
@@ -66,7 +66,7 @@ const settingsVisible = ref(false)
 }
 
 .topbar-logo {
-  font-weight: 600;
+  font-weight: 700;
   font-size: 15px;
   color: var(--color-text);
 }

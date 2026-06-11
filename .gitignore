@@ -1,17 +1,26 @@
-# 依赖
+# Dependencies
 node_modules/
 
-# 打包产物
+# Build output
 dist/
 build/
 
-# 环境变量
+# Environment
 .env
 .env.local
 
-# 编辑器
+# Editor
 .vscode/
 .idea/
 
-# 系统文件
+# System files
 .DS_Store
+Thumbs.db
+
+# Temp files
+*.log
+*.zip
+*.tar.gz
+
+# Vditor local runtime assets — must be included
+# DO NOT ignore public/vditor/

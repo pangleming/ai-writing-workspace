@@ -1,64 +1,63 @@
+/**
+ * LEGACY COMPATIBILITY SHIM
+ *
+ * This store is retained ONLY to avoid breaking existing imports during the
+ * transition to the Markdown-first document model. It delegates to the new
+ * documentStore where possible and provides empty stubs for removed features.
+ *
+ * All new code should use `useDocumentStore()` from './document.js' directly.
+ *
+ * TODO: Remove this file once all consumers have migrated to documentStore.
+ */
+
 import { defineStore } from 'pinia'
 import { ref } from 'vue'
-
-let nextId = 1
+import { useDocumentStore } from './document.js'
 
 export const useEditorStore = defineStore('editor', () => {
+  const doc = useDocumentStore()
+
+  // Empty paragraphs array for consumers that still check .length
   const paragraphs = ref([])
   const activeParagraphId = ref(null)
 
-  function addParagraph(text) {
-    const id = nextId++
-    paragraphs.value.push({
-      id,
-      text,
-      translation: null,
-      translating: false
-    })
-    return id
+  /**
+   * Returns the full text of the active document as a single string.
+   * Used by WorkspaceView for AI context injection.
+   */
+  function fullText() {
+    return doc.activeMarkdown
   }
 
-  function updateParagraph(id, text) {
-    const p = paragraphs.value.find(p => p.id === id)
-    if (p) {
-      p.text = text
-      p.translation = null
-    }
-  }
+  // ── Stubs for removed paragraph operations ─────────────────────────
+  // These no-ops exist so existing imports don't throw.
+  // Components that called these should migrate to the new document model.
 
-  function removeParagraph(id) {
-    const idx = paragraphs.value.findIndex(p => p.id === id)
-    if (idx !== -1) paragraphs.value.splice(idx, 1)
-  }
-
-  function setTranslation(id, translatedText) {
-    const p = paragraphs.value.find(p => p.id === id)
-    if (p) {
-      p.translation = translatedText
-      p.translating = false
-    }
-  }
-
-  function setTranslating(id, val) {
-    const p = paragraphs.value.find(p => p.id === id)
-    if (p) p.translating = val
-  }
-
-  function setActiveParagraph(id) {
-    activeParagraphId.value = id
-  }
-
+  function addParagraph() { /* no-op — use Markdown editor directly */ }
+  function updateParagraph() { /* no-op */ }
+  function removeParagraph() { /* no-op */ }
+  function setTranslation() { /* no-op — now selection-based */ }
+  function setTranslating() { /* no-op */ }
+  function setActiveParagraph() { /* no-op */ }
   function pasteArticle(text) {
-    const lines = text.split('\n').filter(l => l.trim())
-    lines.forEach(line => addParagraph(line.trim()))
+    // Simple compatibility: append to markdown
+    if (text && doc.activeDocument) {
+      const current = doc.activeMarkdown
+      const appended = current ? current + '\n\n' + text.trim() : text.trim()
+      doc.updateActiveMarkdown(appended)
+    }
   }
-
-  const fullText = () => paragraphs.value.map(p => p.text).join('\n\n')
 
   return {
-    paragraphs, activeParagraphId,
-    addParagraph, updateParagraph, removeParagraph,
-    setTranslation, setTranslating, setActiveParagraph,
-    pasteArticle, fullText
+    paragraphs,
+    activeParagraphId,
+    fullText,
+    addParagraph,
+    updateParagraph,
+    removeParagraph,
+    setTranslation,
+    setTranslating,
+    setActiveParagraph,
+    pasteArticle
   }
 })

@@ -49,18 +49,6 @@
             <el-switch v-model="config.gestureEnabled" active-text="Enabled" inactive-text="Disabled" />
           </el-form-item>
 
-          <el-form-item label="Open Palm Trigger Duration" v-if="config.gestureEnabled">
-            <el-slider v-model="config.openPalmDuration" :min="500" :max="2000" :step="100" show-input />
-            <template #extra>Hold Open Palm for this duration to trigger (ms)</template>
-          </el-form-item>
-
-          <el-form-item label="Camera Preview Position" v-if="config.gestureEnabled">
-            <el-select v-model="config.cameraPosition">
-              <el-option label="Bottom Right" value="bottom-right" />
-              <el-option label="Bottom Left" value="bottom-left" />
-              <el-option label="Top Right" value="top-right" />
-            </el-select>
-          </el-form-item>
         </el-form>
       </el-tab-pane>
 

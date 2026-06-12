@@ -76,12 +76,10 @@ function onGestureToggle() {
 
 onMounted(() => {
   window.addEventListener('gesture-toggle-voice', onGestureToggle)
-  window.addEventListener('lexivault:toggle-voice', onGestureToggle)
 })
 
 onUnmounted(() => {
   window.removeEventListener('gesture-toggle-voice', onGestureToggle)
-  window.removeEventListener('lexivault:toggle-voice', onGestureToggle)
 })
 </script>
 

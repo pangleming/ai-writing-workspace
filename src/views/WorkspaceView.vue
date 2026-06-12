@@ -348,18 +348,12 @@ watch(() => aiChat.messages.length, async (newLen, oldLen) => {
 
 // ── Event listeners ──────────────────────────────────────────────────
 
-function onGestureToggleVoice() {
-  window.dispatchEvent(new CustomEvent('lexivault:toggle-voice'))
-}
-
 onMounted(() => {
-  window.addEventListener('gesture-toggle-voice', onGestureToggleVoice)
   window.addEventListener('lexivault:insert-text', onInsertText)
   window.addEventListener('beforeunload', flushEditor)
 })
 
 onUnmounted(() => {
-  window.removeEventListener('gesture-toggle-voice', onGestureToggleVoice)
   window.removeEventListener('lexivault:insert-text', onInsertText)
   window.removeEventListener('beforeunload', flushEditor)
 })

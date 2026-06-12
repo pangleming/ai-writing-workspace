@@ -26,7 +26,6 @@ const emit = defineEmits(['toggle'])
 
 const gesture = useGestureStore()
 
-// 手势 → 功能说明（与 GestureOverlay 保持一致）
 const GESTURE_LABELS = {
   'Open Palm':    '✋ AI 助手',
   'Index Finger': '☝️ 向上滚动',

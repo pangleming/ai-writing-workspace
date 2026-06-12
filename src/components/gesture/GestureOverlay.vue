@@ -68,8 +68,6 @@ const minimized = ref(false)
 const cameraError = ref('')
 const videoRef = ref(null)
 const overlayRef = ref(null)
-
-// 四个核心手势
 const gestures = [
   'Open Palm',
   'Index Finger',
@@ -77,7 +75,6 @@ const gestures = [
   'Fist'
 ]
 
-// 手势 → 功能说明（悬浮 tooltip）
 const gestureLabels = {
   'Open Palm':    '✋ AI 助手',
   'Index Finger': '☝️ 向上滚动',
@@ -126,23 +123,18 @@ function scrollEditor(direction) {
 
 function handleGestureAction(name) {
   switch (name) {
-
-    // ✋ 张开手掌（静止）→ 调出 / 关闭 AI 助手
     case 'Open Palm':
       aiChat.toggleSidebar()
       break
 
-    // ☝️ 一根手指（食指）→ 向上滚动
     case 'Index Finger':
       scrollEditor(-1)
       break
 
-    // ✌️ 两根手指（剪刀手）→ 向下滚动
     case 'Scissor':
       scrollEditor(1)
       break
 
-    // ✊ 握拳 → 调出 / 关闭语音识别
     case 'Fist':
       window.dispatchEvent(new CustomEvent('gesture-toggle-voice'))
       break
